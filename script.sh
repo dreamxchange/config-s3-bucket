@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Variables
-BUCKET_NAME="kbank-eban-prod"
-ACL_STATE=$1 # Pass 'enable' or 'disable' as a parameter
+BUCKET_NAME="your-bucket-name"
+ACL_ACTION=$1        # 'enable' or 'disable'
 
 # Function to enable ACL
 enable_acl() {
@@ -16,12 +16,21 @@ disable_acl() {
     aws s3api put-bucket-acl --bucket "$BUCKET_NAME" --acl private
 }
 
-# Check if the correct parameter is passed
-if [ "$ACL_STATE" == "enable" ]; then
+# Function to change ownership
+change_ownership() {
+    echo "Changing ownership for bucket: $BUCKET_NAME to $1"
+    aws s3api put-bucket-ownership-controls --bucket "$BUCKET_NAME" --ownership-controls \
+        "Rules=[{ObjectOwnership=$1}]"
+}
+
+# Main execution
+if [[ "$ACL_ACTION" == "enable" ]]; then
     enable_acl
-elif [ "$ACL_STATE" == "disable" ]; then
+    change_ownership ObjectWriter
+elif [[ "$ACL_ACTION" == "disable" ]]; then
     disable_acl
+    change_ownership BucketOwnerEnforced
 else
-    echo "Usage: $0 <enable|disable>"
+    echo "Invalid ACL action. Use 'enable' or 'disable'."
     exit 1
 fi
