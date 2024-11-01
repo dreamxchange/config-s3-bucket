@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables
-BUCKET_NAME="your-bucket-name"
+BUCKET_NAME="kbank-eban-prod"
 ACL_ACTION=$1        # 'enable' or 'disable'
 
 # Function to enable ACL
@@ -25,11 +25,13 @@ change_ownership() {
 
 # Main execution
 if [[ "$ACL_ACTION" == "enable" ]]; then
-    enable_acl
+    #enable_acl
     change_ownership ObjectWriter
+    echo $(date) Enabled
 elif [[ "$ACL_ACTION" == "disable" ]]; then
     disable_acl
     change_ownership BucketOwnerEnforced
+    echo $(date) Disabled
 else
     echo "Invalid ACL action. Use 'enable' or 'disable'."
     exit 1
